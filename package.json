@@ -1,15 +1,6 @@
 {
   "name": "audac-mtx",
-  "version": "1.0.0",
-  "api_version": "1.0.0",
-  "description": "Audac MTX-48/88",
-  "keywords": [
-    "Audac",
-    "MTX"
-  ],
-  "manufacturer": "Audac",
-  "product": "MTX48/88",
-  "shortname": "MTX",
+  "version": "2.0.0",
   "main": "index.js",
   "scripts": {
     "format": "prettier --write .",
@@ -17,15 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitfocus/companion-module-audac-mtx.get"
+    "url": "git+https://github.com/bitfocus/companion-module-audac-mtx.git"
   },
-  "author": "Jelle van Abbema",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/bitfocus/companion-module-audac-mtx/issues"
-  },
-  "homepage": "https://github.com/bitfocus/companion-module-audac-mtx#readme",
   "devDependencies": {
-    "prettier": "^2.7.1"
-  }
+    "@companion-module/tools": "^0.5.1",
+    "prettier": "^2.8.1"
+  },
+  "dependencies": {
+    "@companion-module/base": "~1.0.1",
+    "tcp": "^1.0.0"
+  },
+  "prettier": "@companion-module/tools/.prettierrc.json"
 }
