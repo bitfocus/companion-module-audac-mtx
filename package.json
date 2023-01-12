@@ -16,8 +16,7 @@
     "prettier": "^2.8.1"
   },
   "dependencies": {
-    "@companion-module/base": "~1.0.1",
-    "tcp": "^1.0.0"
+    "@companion-module/base": "~1.0.1"
   },
   "prettier": "@companion-module/tools/.prettierrc.json"
 }

@@ -1,5 +1,4 @@
-const { InstanceBase, Regex, runEntrypoint, InstanceStatus } = require('@companion-module/base')
-const tcp = require('tcp')
+const { InstanceBase, Regex, runEntrypoint, InstanceStatus, TCPHelper } = require('@companion-module/base')
 
 class instance extends InstanceBase {
 	constructor(internal) {
@@ -41,40 +40,41 @@ class instance extends InstanceBase {
 			return
 		}
 
-		if (self.config.host !== undefined) {
-			self.socket = tcp.createConnection(self.config.port, self.config.host)
+		self.socket = new TCPHelper(self.config.host, self.config.port)
 
-			self.updateStatus(InstanceStatus.Connecting)
+		self.updateStatus(InstanceStatus.Connecting)
 
-			self.socket.on('status_change', (status, message) => {
-				self.updateStatus(InstanceStatus.UnknownWarning, message)
-			})
-
-			self.socket.on('error', (err) => {
-				self.debug('Network error', err)
-				self.updateStatus(InstanceStatus.ConnectionFailure, err)
-				self.log('error', 'Network error: ' + err.message)
-			})
-
-			self.socket.on('connect', () => {
+		self.socket.on('status_change', (status, message) => {
+			if (status === 'ok') {
 				self.updateStatus(InstanceStatus.Ok)
-				self.debug('Connected')
-			})
+				self.connected = true
+			} else {
+				self.updateStatus(InstanceStatus.UnknownWarning, message)
+				self.connected = false
+			}
+		})
 
-			self.socket.on('data', (data) => {
-				//console.log(data)
-			})
-		}
+		self.socket.on('error', (err) => {
+			self.updateStatus(InstanceStatus.ConnectionFailure, err)
+			self.log('error', 'Network error: ' + err.message)
+		})
+
+		self.socket.on('connect', () => {
+			self.updateStatus(InstanceStatus.Ok)
+			self.log('debug', 'Connected')
+		})
+
+		self.socket.on('data', (data) => {
+			console.log(data)
+		})
 	}
 
 	async destroy() {
-		let self = this
-
-		if (self.socket !== undefined) {
-			self.socket.destroy()
+		if (this.socket !== undefined) {
+			this.socket.destroy()
 		}
 
-		self.debug('destroy', self.id)
+		this.log('debug', 'destroy')
 	}
 
 	getConfigFields() {
@@ -407,13 +407,13 @@ class instance extends InstanceBase {
 	sendCommand(data) {
 		let sendBuf = Buffer.from('#|X001|web|' + data + '|U|\r\n', 'latin1')
 
-		if (sendBuf !== '') {
-			this.debug('sending ', sendBuf, 'to', this.config.host)
+		if (sendBuf.length > 0) {
+			this.log('debug', 'sending ' + sendBuf + ' to: ' + this.config.host)
 
-			if (this.socket !== undefined && this.socket.connected) {
+			if (this.socket !== undefined && this.connected) {
 				this.socket.send(sendBuf)
 			} else {
-				this.debug('Socket not connected :(')
+				this.log('error', 'Socket not connected :(')
 			}
 		}
 	}
