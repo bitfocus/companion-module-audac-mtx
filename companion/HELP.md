@@ -1,4 +1,4 @@
-## Devantech dS
+## Audac MTX
 
 This module controls Audac MTX48/88 via TCP.
 
